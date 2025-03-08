@@ -131,10 +131,10 @@ if __name__ == "__main__":
         st.set_page_config(page_title="Vidya Support Chatbot")
         st.title("Searchable Dropdown Menu with Link Navigation")
         links = {
-            "Google": "https://www.google.com",
-            "YouTube": "https://www.youtube.com",
+            "Vidya Website": "https://vidyaacademy.ac.in/",
+            "Documents to be produced at the time of government admission": "https://vidyaacademy.ac.in/admin/upload/pdf/274915503DOCUMENTS2024.pdf",
+            "Guidelines for Fee Remittance": "https://vidyaacademy.ac.in/admin/upload/pdf/1448146381517027893Guidelinesforfeeremittance.pdf",
             "GitHub": "https://github.com",
-            "Stack Overflow": "https://stackoverflow.com",
             "Reddit": "https://www.reddit.com"
         }
 
