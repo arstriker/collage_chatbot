@@ -37,23 +37,6 @@ Important: Base your entire response solely on the information provided in the c
 """
 
 
-def process_document(uploaded_file: UploadedFile) -> list[Document]:
-    temp_file = tempfile.NamedTemporaryFile("wb", suffix=".pdf", delete=False)
-    temp_file.write(uploaded_file.read())
-    temp_file.close()
-
-    loader = PyMuPDFLoader(temp_file.name)
-    docs = loader.load()
-    os.unlink(temp_file.name)
-
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=500,
-        chunk_overlap=100,
-        separators=["\n\n", "\n", ".", "?", "!", " ", ""],
-    )
-    return text_splitter.split_documents(docs)
-
-
 def get_vector_collection() -> chromadb.Collection:
     ollama_ef = OllamaEmbeddingFunction(
         url="http://localhost:11434/api/embeddings",
@@ -65,23 +48,6 @@ def get_vector_collection() -> chromadb.Collection:
         embedding_function=ollama_ef,
         metadata={"hnsw:space": "cosine"},
     )
-
-
-def add_to_vector_collection(all_splits: list[Document], file_name: str):
-    collection = get_vector_collection()
-    documents, metadatas, ids = [], [], []
-
-    for idx, split in enumerate(all_splits):
-        documents.append(split.page_content)
-        metadatas.append(split.metadata)
-        ids.append(f"{file_name}_{idx}")
-
-    collection.upsert(
-        documents=documents,
-        metadatas=metadatas,
-        ids=ids,
-    )
-    st.success("Data added to the vector store!")
 
 
 def query_collection(prompt: str, n_results: int = 10):
@@ -117,7 +83,7 @@ def re_rank_cross_encoders(documents: list[str]) -> tuple[str, list[int]]:
     relevant_text_ids = []
 
     encoder_model = CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
-    ranks = encoder_model.rank(prompt, documents, top_k=3)
+    ranks = encoder_model.rank(prompt, documents, top_k=5)
     for rank in ranks:
         relevant_text += documents[rank["corpus_id"]]
         relevant_text_ids.append(rank["corpus_id"])
@@ -134,8 +100,7 @@ if __name__ == "__main__":
             "Vidya Website": "https://vidyaacademy.ac.in/",
             "Documents to be produced at the time of government admission": "https://vidyaacademy.ac.in/admin/upload/pdf/274915503DOCUMENTS2024.pdf",
             "Guidelines for Fee Remittance": "https://vidyaacademy.ac.in/admin/upload/pdf/1448146381517027893Guidelinesforfeeremittance.pdf",
-            "GitHub": "https://github.com",
-            "Reddit": "https://www.reddit.com"
+            "GitHub": "https://github.com"
         }
 
         # Dropdown with search functionality
