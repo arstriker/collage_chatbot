@@ -33,20 +33,20 @@ The chatbot uses a Retrieval Augmented Generation (RAG) pipeline:
     *   The answer is streamed back to the user in the chatbot interface.
 
 ## Technologies Used
--   **Python 3.8+**
--   **Streamlit:** For creating the web-based user interface.
--   **Langchain (`langchain-community`, `langchain-core`):** For document loading (PyMuPDFLoader) and text splitting (RecursiveCharacterTextSplitter).
--   **ChromaDB (`chromadb`):** For creating and managing the vector store.
--   **Ollama (`ollama`):** For running local Large Language Models (LLMs) and embedding models.
-    -   LLM: `llama3.2:3b` (or user-configured)
-    -   Embedding Model: `nomic-embed-text:latest`
--   **Sentence Transformers (`sentence-transformers` via `CrossEncoder`):** For re-ranking retrieved documents.
--   **PyMuPDF (`pymupdf`):** For parsing and extracting text from PDF files.
+-   **Python:** Version 3.8+
+-   **Streamlit:** For building the interactive web user interface.
+-   **Langchain (`langchain-community`, `langchain-core`):** Used for document loading (`PyMuPDFLoader`) and text splitting (`RecursiveCharacterTextSplitter`).
+-   **ChromaDB (`chromadb`):** Serves as the vector store for creating and managing document embeddings.
+-   **Ollama (`ollama`):** Enables running local Large Language Models (LLMs) and embedding models.
+    -   **LLM:** Configured with `llama3.2:3b` (can be changed by the user).
+    -   **Embedding Model:** Uses `nomic-embed-text:latest`.
+-   **Sentence Transformers (`sentence-transformers`):** The `CrossEncoder` model (`cross-encoder/ms-marco-MiniLM-L-6-v2`) is used for re-ranking retrieved document chunks to improve context relevance.
+-   **PyMuPDF (`pymupdf`):** For parsing text and metadata from PDF files.
 
 ## Prerequisites
--   Python 3.8 or higher.
--   [Ollama](https://ollama.com/) installed and running.
--   Access to a terminal or command prompt.
+-   Python 3.8 or a newer version.
+-   [Ollama](https://ollama.com/) installed and actively running on your system.
+-   A terminal or command prompt for executing commands.
 
 ## Setup and Installation
 1.  **Clone the repository:**
@@ -54,66 +54,98 @@ The chatbot uses a Retrieval Augmented Generation (RAG) pipeline:
     git clone <repository-url>
     cd <repository-directory>
     ```
-2.  **Create and activate a virtual environment (recommended):**
+2.  **Create and Activate a Virtual Environment (Recommended):**
     ```bash
     python -m venv venv
-    # On Windows
+    ```
+    *On Windows:*
+    ```bash
     venv\Scripts\activate
-    # On macOS/Linux
+    ```
+    *On macOS/Linux:*
+    ```bash
     source venv/bin/activate
     ```
-3.  **Install dependencies:**
+3.  **Install Dependencies:**
+    Navigate to the project directory in your terminal (if you aren't already there) and run:
     ```bash
     pip install -r requirements.txt
     ```
-4.  **Ensure Ollama is running:**
-    Start your Ollama application. By default, it should be accessible at `http://localhost:11434`. The application code uses this default URL.
-5.  **Pull necessary Ollama models:**
-    Open your terminal and run the following commands to download the required models:
+4.  **Ensure Ollama is Running:**
+    Start your Ollama desktop application or ensure the Ollama service is running. The Python application connects to Ollama using its default API endpoint (`http://localhost:11434`).
+5.  **Download Ollama Models:**
+    If you haven't already, pull the necessary models using the following commands in your terminal:
     ```bash
     ollama pull nomic-embed-text:latest
+    ```
+    ```bash
     ollama pull llama3.2:3b
     ```
-    *Note: If you wish to use a different LLM, you can pull it via `ollama pull <model-name>` and update the `model` parameter in `chatbot.py` and `pdfupload.py` within the `call_llm` function.*
+    *Note: If you wish to use a different LLM, you can pull it via `ollama pull <model-name>` and update the `model_name` parameter in `chatbot.py` and `pdfupload.py` (specifically in the `call_llm` function and `OllamaEmbeddingFunction` initialization if the embedding model changes).*
 
 ## Running the Application
 
-There are two main parts to this application: uploading PDFs to the knowledge base and interacting with the chatbot.
+The application consists of two main Streamlit interfaces: one for uploading and processing PDF documents, and another for interacting with the chatbot.
 
-### 1. Uploading PDF Documents
-This step populates the vector store with information the chatbot can use.
-```bash
-streamlit run pdfupload.py
-```
--   Open the URL provided by Streamlit (usually `http://localhost:8501`) in your web browser.
--   Use the sidebar to upload PDF files.
--   Click the "Process" button to embed the document(s) and add them to the ChromaDB vector store. You should see a success message.
+### 1. Uploading PDF Documents (`pdfupload.py`)
+This script allows you to add documents to the chatbot's knowledge base.
+-   **Navigate to the project directory** in your terminal.
+-   **Run the PDF upload application:**
+    ```bash
+    streamlit run pdfupload.py
+    ```
+-   Streamlit will typically open the application in your default web browser (e.g., at `http://localhost:8501`).
+-   In the web interface, use the sidebar to **upload your PDF file(s)**.
+-   Click the **"⚡️ Process"** button. This will:
+    -   Load the PDF content.
+    -   Split it into manageable chunks.
+    -   Generate embeddings for each chunk.
+    -   Store these embeddings in the ChromaDB vector store (`./demo-rag-chroma` directory).
+-   A success message will appear once processing is complete.
 
-### 2. Interacting with the Chatbot
-Once you have processed some PDF documents, you can start asking questions.
-```bash
-streamlit run chatbot.py
-```
--   Open the URL provided by Streamlit (usually `http://localhost:8501`, though if `pdfupload.py` is still running, it might be a different port like `8502`) in your web browser.
--   The main interface will display a "Vidya Chatbot" header and a text area to ask questions.
--   Type your question related to the content of the uploaded PDFs and click "🔥 Ask".
--   The chatbot will stream its response.
--   You can also use the sidebar links for quick navigation to college-related websites.
+### 2. Interacting with the Chatbot (`chatbot.py`)
+After populating the knowledge base, you can start asking questions.
+-   **Navigate to the project directory** in your terminal.
+-   **Run the chatbot application:**
+    ```bash
+    streamlit run chatbot.py
+    ```
+-   This will open a new Streamlit interface in your browser (if `pdfupload.py` is still running, this might be on a different port, e.g., `http://localhost:8502`).
+-   The interface features:
+    -   A **logo** and the title "Vidya Chatbot".
+    -   A **text area** labeled "**Ask a question related to College:**".
+    -   An "**🔥 Ask**" button.
+    -   A **sidebar** with useful links (e.g., Vidya Website, document guidelines).
+-   Type your question into the text area and click "🔥 Ask".
+-   The chatbot will retrieve relevant information from the processed PDFs, generate an answer using the local LLM, and stream the response back to you.
+-   You can expand sections to see the raw retrieved documents and the most relevant document IDs.
 
 ## Project Structure
-```
+```plaintext
 .
 ├── chatbot.py            # Main Streamlit application for the chatbot UI
 ├── pdfupload.py          # Streamlit application for uploading and processing PDFs
-├── requirements.txt      # Python dependencies
-├── README.md             # This file
-├── demo-rag-chroma/      # Directory where ChromaDB stores its data (created automatically)
-└── d500x300.jpg          # Logo image (ensure path is correct or remove if not used)
+├── requirements.txt      # Python dependencies for the project
+├── README.md             # This documentation file
+├── demo-rag-chroma/      # Directory where ChromaDB stores its vector data (auto-generated)
+└── d500x300.jpg          # Logo image displayed in the UI
 ```
-*Note: The `d500x300.jpg` path in `chatbot.py` and `pdfupload.py` is currently an absolute path (`D:\Arohan resources\chatbot\d500x300.jpg`). You might need to adjust this to a relative path (e.g., `./d500x300.jpg`) or remove the image loading if the image is not present in your project directory.*
+**Important Note on Image Path:**
+The scripts `chatbot.py` and `pdfupload.py` currently use an absolute path for the logo image: `D:\Arohan resources\chatbot\d500x300.jpg`.
+For the application to work correctly on other systems or if you move the project, you should:
+1.  Place the `d500x300.jpg` file in the root of the project directory.
+2.  Change the `logo_path` variable in both `chatbot.py` and `pdfupload.py` to a relative path:
+    ```python
+    logo_path = "d500x300.jpg"
+    ```
+    Or, if you prefer to place it in an `assets` subfolder:
+    ```python
+    logo_path = "assets/d500x300.jpg"
+    ```
+    (And ensure the image is in `assets/d500x300.jpg`).
 
 ## Contributing
-Contributions are welcome! Please feel free to submit a pull request or open an issue if you have suggestions or find bugs.
+Contributions, issues, and feature requests are welcome! Feel free to check the issues page if you want to contribute.
 
 ## License
-This project is open-source. Please refer to the `LICENSE` file if one is included, otherwise, assume it is provided as-is without a specific license. (Consider adding a `LICENSE` file, e.g., MIT or Apache 2.0).
+This project is currently not under a specific license. You are free to use and modify the code. Consider adding an open-source license like MIT or Apache 2.0 if you plan to distribute it more widely.
