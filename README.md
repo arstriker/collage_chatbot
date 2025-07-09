@@ -146,6 +146,3 @@ For the application to work correctly on other systems or if you move the projec
 
 ## Contributing
 Contributions, issues, and feature requests are welcome! Feel free to check the issues page if you want to contribute.
-
-## License
-This project is currently not under a specific license. You are free to use and modify the code. Consider adding an open-source license like MIT or Apache 2.0 if you plan to distribute it more widely.
