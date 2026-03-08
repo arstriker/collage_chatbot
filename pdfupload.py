@@ -143,7 +143,7 @@ if __name__ == "__main__":
             all_splits = process_document(uploaded_file)
             add_to_vector_collection(all_splits, normalize_uploaded_file_name)
 
-    logo_path = "D:\Arohan resources\chatbot\d500x300.jpg"
+    logo_path = os.path.join(os.path.dirname(__file__), "d500x300.jpg")
     st.image(logo_path, width=200)
 
     # Question and Answer Area
