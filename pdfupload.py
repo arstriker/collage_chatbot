@@ -112,11 +112,16 @@ def call_llm(context: str, prompt: str):
             break
 
 
-def re_rank_cross_encoders(documents: list[str]) -> tuple[str, list[int]]:
+@st.cache_resource
+def load_cross_encoder():
+    return CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
+
+
+def re_rank_cross_encoders(prompt: str, documents: list[str]) -> tuple[str, list[int]]:
     relevant_text = ""
     relevant_text_ids = []
 
-    encoder_model = CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
+    encoder_model = load_cross_encoder()
     ranks = encoder_model.rank(prompt, documents, top_k=5)
     for rank in ranks:
         relevant_text += documents[rank["corpus_id"]]
@@ -156,7 +161,7 @@ if __name__ == "__main__":
     if ask and prompt:
         results = query_collection(prompt)
         context = results.get("documents")[0]
-        relevant_text, relevant_text_ids = re_rank_cross_encoders(context)
+        relevant_text, relevant_text_ids = re_rank_cross_encoders(prompt, context)
         response = call_llm(context=relevant_text, prompt=prompt)
         st.write_stream(response)
 
