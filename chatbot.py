@@ -113,7 +113,7 @@ if __name__ == "__main__":
         if option in links:
             st.markdown(f"[Click here to visit {option}]({links[option]})")
 
-    logo_path = "D:\Arohan resources\chatbot\d500x300.jpg"
+    logo_path = os.path.join(os.path.dirname(__file__), "d500x300.jpg")
     st.image(logo_path, width=200)
 
     # Question and Answer Area
