@@ -1,5 +1,4 @@
 import os
-import tempfile
 
 import chromadb
 import ollama
@@ -7,11 +6,7 @@ import streamlit as st
 from chromadb.utils.embedding_functions.ollama_embedding_function import (
     OllamaEmbeddingFunction,
 )
-from langchain_community.document_loaders import PyMuPDFLoader
-from langchain_core.documents import Document
-from langchain_text_splitters import RecursiveCharacterTextSplitter
 from sentence_transformers import CrossEncoder
-from streamlit.runtime.uploaded_file_manager import UploadedFile
 
 system_prompt = """
 You are an AI assistant tasked with providing detailed answers based solely on the given context. Your goal is to analyze the information provided and formulate a comprehensive, well-structured response to the question.
@@ -136,4 +131,3 @@ if __name__ == "__main__":
         with st.expander("See most relevant document ids"):
             st.write(relevant_text_ids)
             st.write(relevant_text)
-
