@@ -32,6 +32,7 @@ Important: Base your entire response solely on the information provided in the c
 """
 
 
+@st.cache_resource
 def get_vector_collection() -> chromadb.Collection:
     ollama_ef = OllamaEmbeddingFunction(
         url="http://localhost:11434/api/embeddings",
