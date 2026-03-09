@@ -54,6 +54,7 @@ def process_document(uploaded_file: UploadedFile) -> list[Document]:
     return text_splitter.split_documents(docs)
 
 
+@st.cache_resource
 def get_vector_collection() -> chromadb.Collection:
     ollama_ef = OllamaEmbeddingFunction(
         url="http://localhost:11434/api/embeddings",
